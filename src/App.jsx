@@ -1,50 +1,92 @@
 import React from 'react';
 
-import useLocalStorage from './useLocalStorage';
-import useFetch from './useFetch';
+const formFields = [
+  {
+    id: 'nome',
+    label: 'Nome',
+    type: 'text',
+  },
+  {
+    id: 'email',
+    label: 'E-mail',
+    type: 'email',
+  },
+  {
+    id: 'senha',
+    label: 'Senha',
+    type: 'password',
+  },
+  {
+    id: 'cep',
+    label: 'CEP',
+    type: 'text',
+  },
+  {
+    id: 'rua',
+    label: 'Rua',
+    type: 'text',
+  },
+  {
+    id: 'numero',
+    label: 'Número',
+    type: 'text',
+  },
+  {
+    id: 'bairro',
+    label: 'Bairro',
+    type: 'text',
+  },
+  {
+    id: 'cidade',
+    label: 'Cidade',
+    type: 'text',
+  },
+  {
+    id: 'estado',
+    label: 'Estado',
+    type: 'text',
+  },
+];
 
 const App = () => {
-  const [product, setProduct] = useLocalStorage('produto', '');
-  const { data, error, loading, request } = useFetch();
+  const [form, setForm] = React.useState(
+    formFields.reduce((acc, field) => {
+      return { ...acc, [field.id]: '' };
+    }, {}),
+  );
 
-  React.useEffect(() => {
-    async function fetchData() {
-      const json = await request(
-        `https://ranekapi.origamid.dev/json/api/produto/`
-      );
+  const [response, setResponse] = React.useState(null);
 
-      console.log(json);
-    }
+  function handleSubmit(e) {
+    e.preventDefault();
 
-    fetchData();
-  }, [request]);
-
-  function handleClick({ target }) {
-    setProduct(target.innerText.toLowerCase());
+    fetch('https://ranekapi.origamid.dev/json/api/usuario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(form),
+    }).then((res) => setResponse(res));
   }
 
-  if (error)
-    return <p>{error}</p>;
-  
-  if (loading)
-    return <p>Carregando...</p>;
+  function handleChange({ target }) {
+    const { id, value } = target;
+    setForm({ ...form, [id]: value });
+  }
 
-  if (data)
-    return (
-      <div>
-        <p>Produto preferido: {product}</p>
-        <button onClick={handleClick}>Notebook</button>
-        <button onClick={handleClick}>Smartphone</button>
+  return (
+    <form onSubmit={handleSubmit}>
+      {formFields.map(({ id, label, type }) => (
+        <div key={id}>
+          <label htmlFor={id}>{label}</label>
+          <input type={type} id={id} value={form[id]} onChange={handleChange} />
+        </div>
+      ))}
 
-        {data.map((product) => (
-          <div key={product.id}>
-            <h1>{product.nome}</h1>
-          </div>
-        ))}
-      </div>
-    );
-  else
-    return null;
+      <button>Enviar</button>
+      {response && response.ok && <p>Usuário criado</p>}
+    </form>
+  );
 };
 
 export default App;
