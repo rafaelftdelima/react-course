@@ -2,90 +2,58 @@ import React from 'react';
 
 const formFields = [
   {
-    id: 'nome',
-    label: 'Nome',
-    type: 'text',
+    value: 'azul',
+    label: 'Azul',
   },
   {
-    id: 'email',
-    label: 'E-mail',
-    type: 'email',
+    value: 'vermelho',
+    label: 'Vermelho',
   },
   {
-    id: 'senha',
-    label: 'Senha',
-    type: 'password',
+    value: 'verde',
+    label: 'Verde',
   },
   {
-    id: 'cep',
-    label: 'CEP',
-    type: 'text',
+    value: 'amarelo',
+    label: 'Amarelo',
   },
   {
-    id: 'rua',
-    label: 'Rua',
-    type: 'text',
-  },
-  {
-    id: 'numero',
-    label: 'Número',
-    type: 'text',
-  },
-  {
-    id: 'bairro',
-    label: 'Bairro',
-    type: 'text',
-  },
-  {
-    id: 'cidade',
-    label: 'Cidade',
-    type: 'text',
-  },
-  {
-    id: 'estado',
-    label: 'Estado',
-    type: 'text',
+    value: 'roxo',
+    label: 'Roxo',
   },
 ];
 
 const App = () => {
-  const [form, setForm] = React.useState(
-    formFields.reduce((acc, field) => {
-      return { ...acc, [field.id]: '' };
-    }, {}),
-  );
-
-  const [response, setResponse] = React.useState(null);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    fetch('https://ranekapi.origamid.dev/json/api/usuario', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(form),
-    }).then((res) => setResponse(res));
-  }
+  const [colors, setColors] = React.useState([]);
 
   function handleChange({ target }) {
-    const { id, value } = target;
-    setForm({ ...form, [id]: value });
+    if (target.checked) {
+      setColors([ ...colors, target.value ]);
+    } else {
+      setColors(colors.filter((color) => color !== target.value));
+    }
+  }
+
+  function handleChecked(color) {
+    return colors.includes(color);
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {formFields.map(({ id, label, type }) => (
-        <div key={id}>
-          <label htmlFor={id}>{label}</label>
-          <input type={type} id={id} value={form[id]} onChange={handleChange} />
-        </div>
-      ))}
-
-      <button>Enviar</button>
-      {response && response.ok && <p>Usuário criado</p>}
-    </form>
+    <>
+      <form>
+        {formFields.map(({ value, label }) => (
+          <label key={value}>
+            <input type="checkbox" value={value} checked={handleChecked(value)} onChange={handleChange} />
+            {label}
+          </label>
+        ))}
+      </form>
+      <ul>
+        {colors.map((color) => (
+          <li key={color}>{color}</li>
+        ))}
+      </ul>
+    </>
   );
 };
 
