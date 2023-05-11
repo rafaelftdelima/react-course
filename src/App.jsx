@@ -1,59 +1,31 @@
 import React from 'react';
+import useForm from './Hooks/useForm';
 
-const formFields = [
-  {
-    value: 'azul',
-    label: 'Azul',
-  },
-  {
-    value: 'vermelho',
-    label: 'Vermelho',
-  },
-  {
-    value: 'verde',
-    label: 'Verde',
-  },
-  {
-    value: 'amarelo',
-    label: 'Amarelo',
-  },
-  {
-    value: 'roxo',
-    label: 'Roxo',
-  },
-];
+import Input from './Input';
 
 const App = () => {
-  const [colors, setColors] = React.useState([]);
+  const cep = useForm('cep');
+  const email = useForm('email');
+  const nome = useForm();
+  const sobrenome = useForm(false);
 
-  function handleChange({ target }) {
-    if (target.checked) {
-      setColors([ ...colors, target.value ]);
-    } else {
-      setColors(colors.filter((color) => color !== target.value));
-    }
-  }
+  function handleSubmit(e) {
+    e.preventDefault();
 
-  function handleChecked(color) {
-    return colors.includes(color);
+    if (cep.validate() && email.validate() && nome.validate())
+      console.log('Enviado');
+    else
+      console.log('Não enviado');
   }
 
   return (
-    <>
-      <form>
-        {formFields.map(({ value, label }) => (
-          <label key={value}>
-            <input type="checkbox" value={value} checked={handleChecked(value)} onChange={handleChange} />
-            {label}
-          </label>
-        ))}
-      </form>
-      <ul>
-        {colors.map((color) => (
-          <li key={color}>{color}</li>
-        ))}
-      </ul>
-    </>
+    <form onSubmit={handleSubmit}>
+      <Input id='nome' label='Nome' type='text' {...nome} />
+      <Input id='sobrenome' label='Sobrenome' type='text' {...sobrenome} />
+      <Input id='email' label='E-mail' type='email' {...email} />
+      <Input id='cep' label='CEP' type='text' placeholder='00000-000' {...cep} />
+      <button>Enviar</button>
+    </form>
   );
 };
 
